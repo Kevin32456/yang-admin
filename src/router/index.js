@@ -89,9 +89,9 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/documentation/index'),
+        component: () => import('@/views/table/complex-table'),
         name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
+        meta: { title: '商品列表', icon: 'documentation', affix: true }
       }
     ]
   },
@@ -104,7 +104,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/guide/index'),
         name: 'Guide',
-        meta: { title: 'Guide', icon: 'guide', noCache: true }
+        meta: { title: '銷售紀錄', icon: 'guide', noCache: true }
       }
     ]
   },

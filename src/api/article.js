@@ -1,10 +1,28 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
+export function deletePlan(data) {
+  console.log(data._id)
   return request({
-    url: '/vue-element-admin/article/list',
-    method: 'get',
-    params: query
+    url: `http://localhost:8000/api/v1/delPlan`,
+    method: 'post',
+    data: {
+      id: data._id
+    }
+  })
+}
+
+export function createPlan(data) {
+  return request({
+    url: 'http://localhost:8000/api/v1/setPlan',
+    method: 'post',
+    data
+  })
+}
+
+export function fetchPlanList(query) {
+  return request({
+    url: 'http://localhost:8000/api/v1/getPlan',
+    method: 'GET'
   })
 }
 
