@@ -65,13 +65,13 @@
           <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="方案名稱">
+      <el-table-column label="名稱">
         <template slot-scope="{ row }">
           <span>{{ row.planName }}</span>
           <!-- <el-tag>{{ row.planName }}</el-tag> -->
         </template>
       </el-table-column>
-      <el-table-column label="方案價格">
+      <el-table-column label="價格">
         <template slot-scope="{ row }">
           <span>{{ row.amount }}</span>
         </template>
@@ -97,13 +97,25 @@
           <span v-else>0</span>
         </template>
       </el-table-column> -->
-      <!-- <el-table-column label="Status" class-name="status-col" width="100">
+      <el-table-column label="折扣金額">
+        <template slot-scope="{ row }">
+          <span>{{ row.bonus }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否折扣" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
+          <el-tag :type="row.isBonus | statusFilter">
+            {{ bonusFormate(row.status) }}
           </el-tag>
         </template>
-      </el-table-column> -->
+      </el-table-column>
+      <el-table-column label="上架狀態" class-name="status-col" width="100">
+        <template slot-scope="{row}">
+          <el-tag :type="row.status | statusFilter">
+            {{ statusFormate(row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -115,12 +127,19 @@
             編輯
           </el-button>
           <el-button
-            v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="handleDelete(row, $index)"
           >
             刪除
+          </el-button>
+          <el-button
+            v-if="row.status != 'deleted'"
+            size="mini"
+            :type="row.status == true ? 'danger' : 'Success'"
+            @click="handleChangeStatus(row, $index)"
+          >
+            {{ row.status == true ? '下架' : '上架' }}
           </el-button>
         </template>
       </el-table-column>
@@ -134,7 +153,7 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog title="新增方案" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -151,10 +170,11 @@
         <!-- <el-form-item label="Date" prop="timestamp">
           <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
         </el-form-item> -->
-        <el-form-item label="方案編號" prop="plan">
+        <!-- todo編號優化 -->
+        <el-form-item label="編號" prop="plan">
           <el-input v-model="temp.plan" placeholder="填入英文字母例如A" />
         </el-form-item>
-        <el-form-item label="方案名稱" prop="planName">
+        <el-form-item label="名稱" prop="planName">
           <el-input
             v-model="temp.planName"
             placeholder="顯示在商品頁上的名稱"
@@ -163,17 +183,27 @@
         <el-form-item label="方案價格" prop="amount">
           <el-input v-model="temp.amount" placeholder="輸入價格..." />
         </el-form-item>
-        <!-- <el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+        <el-form-item label="是否折扣">
+          <el-radio-group v-model="temp.isBonus">
+            <el-radio label="是" />
+            <el-radio label="否" />
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="Imp">
+        <el-form-item label="折扣金額" prop="bonus">
+          <el-input v-model="temp.bonus" placeholder="輸入折扣價格..." />
+        </el-form-item>
+        <el-form-item label="是否上架">
+          <el-radio-group v-model="temp.status">
+            <el-radio label="上架" />
+            <el-radio label="下架" />
+          </el-radio-group>
+        </el-form-item>
+        <!-- <el-form-item label="Imp">
           <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
-        </el-form-item>
-        <el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item> -->
+        <el-form-item label="商品標題">
+          <el-input v-model="temp.title" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="請輸入標題" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> 取消 </el-button>
@@ -274,11 +304,10 @@ export default {
       temp: {
         plan: undefined,
         planName: 1,
-        amount: ''
-        // timestamp: new Date(),
-        // title: '',
-        // type: '',
-        // status: 'published'
+        amount: '',
+        title: '',
+        isBonus: false,
+        bonus: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -311,6 +340,20 @@ export default {
     this.getList()
   },
   methods: {
+    statusFormate(status) {
+      if (status) {
+        return '上架中'
+      } else {
+        return '已下架'
+      }
+    },
+    bonusFormate(status) {
+      if (status) {
+        return '折扣中'
+      } else {
+        return '無折扣'
+      }
+    },
     getList() {
       this.listLoading = true
       fetchPlanList(this.listQuery).then((response) => {
@@ -416,6 +459,17 @@ export default {
       })
     },
     handleDelete(row, index) {
+      deletePlan(row).then((res) => {
+        this.getList()
+        this.$notify({
+          title: 'Success',
+          message: 'Delete Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    handleChangeStatus(row, index) {
       deletePlan(row).then((res) => {
         this.getList()
         this.$notify({
