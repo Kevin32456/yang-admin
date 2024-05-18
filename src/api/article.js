@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function deletePlan(data) {
   console.log(data._id)
   return request({
-    url: `http://localhost:8000/api/v1/delPlan`,
+    url: `https://www.1wenzone.com/api/v1/delPlan`,
     method: 'post',
     data: {
       id: data._id
@@ -13,7 +13,7 @@ export function deletePlan(data) {
 
 export function createPlan(data) {
   return request({
-    url: 'http://localhost:8000/api/v1/setPlan',
+    url: 'https://www.1wenzone.com/api/v1/setPlan',
     method: 'post',
     data
   })
@@ -21,7 +21,7 @@ export function createPlan(data) {
 
 export function fetchPlanList(query) {
   return request({
-    url: 'http://localhost:8000/api/v1/getPlan',
+    url: 'https://www.1wenzone.com/api/v1/getPlan',
     method: 'GET'
   })
 }

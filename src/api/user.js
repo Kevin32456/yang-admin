@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data) {
   return request({
-    url: 'http://localhost:8000/api/v1/adminUserLogin',
+    url: 'https://www.1wenzone.com/api/v1/adminUserLogin',
     method: 'post',
     data
   })
